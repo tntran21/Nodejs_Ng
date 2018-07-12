@@ -4,10 +4,11 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
+
+// Sử dụng bcrypt để mã hóa dữ liệu
 var bcrypt = require('bcryptjs');
 
 module.exports = {
-
   attributes: {
     user_id: {
       type: 'integer',
@@ -32,7 +33,8 @@ module.exports = {
       enum: ["male", "female"]
     }
   },
-  //truoc khi nhap mat khau vao csdl thi ma hoa password truoc
+
+  //Trước khi lưu mật khẩu vào csdl thì phải mã hóa dữ liệu trước
   beforeCreate: function (user, cb) {
     bcrypt.genSalt(10, function (err, salt) {
       bcrypt.hash(user.user_password, salt, function (err, hash) {
@@ -47,7 +49,7 @@ module.exports = {
     });
   },
 
-  //Kiem tra mat khau, so sanh hai chuoi da ma hoa
+  //Kiểm tra mật khẩu so sánh hai chuỗi đã mã hóa
   comparePassword: function (password, user, cb) {
     bcrypt.compare(password, user.user_password, function (err, match) {
       if (err) {
@@ -60,6 +62,5 @@ module.exports = {
       }
     });
   }
-
 };
 

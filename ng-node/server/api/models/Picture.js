@@ -7,6 +7,7 @@
 
 module.exports = {
 
+  // Khai báo thông tin của một ảnh
   attributes: {
     pic_id:{
       type: 'integer',
@@ -17,7 +18,6 @@ module.exports = {
       type: 'string',
       size: 100,
     }
-
   }
 };
 

@@ -17,7 +17,6 @@ module.exports = {
       type: 'string',
       size: 50
     }
-
   }
 };
 
