@@ -9,22 +9,17 @@
 
 //Thu vien ma hoa password 
 var bcrypt = require('bcryptjs');
-
 //Ma hoa thong tin sau khi dang nhap thanh chuoi token de luu trang thai dang nhap
 var jwt = require('../services/jsonwebtoken');
 
 module.exports = {
+    // Tạo một người dùng mới:
     user_create: function (req, res) {
-        //Nhận dữ liệu từ client gửi lên,
-        //Kiểm tra dữ liệu,
-        //Kiểm tra user đã tồn tại hay chưa,
-        //Tạo user
-
-        //Nhan du lieu tu client gui len
+        // Nhan du lieu tu client gui len
         var user_email = req.param('user_email'),
             user_password = req.param('user_password');
 
-        //Kiem tra email
+        // Kiem tra email
         if (!user_email || user_email === '') {
             return res.json({
                 status: 'error',
@@ -38,7 +33,10 @@ module.exports = {
                 message: 'Bạn chưa nhập mật khẩu'
             });
         }
-        //Kiem tra user ton tai hay chua, voi findOne() tra ve 2 tham so (err, find)
+        /**
+         * Kiểm tra email của user đã tồn tại hay chưa, nếu:
+         * Tìm thấy: Thông báo lỗi đã tồn tại
+         */
         Users.findOne({ user_email: user_email }).exec(function (err, find) {
             //Neu trong qua trinh tao bi loi thi in ra man hinh
             if (err) { return console.log(err) }
