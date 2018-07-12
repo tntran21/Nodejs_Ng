@@ -13,7 +13,6 @@ var bcrypt = require('bcryptjs');
 var jwt = require('../services/jsonwebtoken');
 
 module.exports = {
-    // Tạo một người dùng mới. Người dùng được tạo bằng Email
     user_create: function (req, res) {
         // Nhận dữ liệu từ người dùng gửi lên
         var client_user_email = req.param('client_user_email'),
@@ -53,7 +52,12 @@ module.exports = {
 
             } else {
                 // Email của user chưa tồn tại, tiến hành tạo mới.
-                Users.create({ user_email: client_user_email, user_password: client_user_password }).exec(function (err, created) {
+                Users.create(
+                    { 
+                        user_email: client_user_email, 
+                        user_password: client_user_password ,
+                    }).exec(function (err, created) {
+
                     if (err) { return console.log(err) }
 
                     if (created) {
@@ -71,6 +75,7 @@ module.exports = {
     // Xem thông tin của người dùng.
     user_profile: function (req, res) {
         var user_id = req.headers.authID;
+
         if (!user_id || user_id === '' || user_id === 0) {
             return res.json({
                 status: 'error',
@@ -79,6 +84,7 @@ module.exports = {
         }
 
         Users.findOne({ user_id: user_id }).exec(function (err, find) {
+
             if (err) { return console.log(err); }
 
             if (find) {
@@ -104,10 +110,10 @@ module.exports = {
      */
     user_update: function (req, res) {
         // nhận dữ liệu từ người dùng gửi lên.
-        var client_user_id = req.param('client_user_id'),
-            update_email = req.param('update_update_email'),
+        var client_user_id       = req.param('client_user_id'),
+            update_email         = req.param('update_update_email'),
             update_user_fullname = req.param('update_user_fullname'),
-            update_user_sex = req.param('update_user_sex');
+            update_user_sex      = req.param('update_user_sex');
 
         // Kiểm tra id gửi lên
         if (!client_user_id || client_user_id === '' || client_user_id === 0) {
@@ -124,7 +130,11 @@ module.exports = {
 
                 if (find) {
                     // Không cho update email
-                    Users.update({ user_id: client_user_id }, { user_fullname: update_user_fullname, user_sex: update_user_sex }).exec(function (err, updated) {
+                    Users.update(
+                        { user_id: client_user_id }, 
+                        { user_fullname: update_user_fullname, user_sex: update_user_sex }
+                    ).exec(function (err, updated) {
+
                         if (err) { return console.log(err); }
 
                         if (updated) {
@@ -138,7 +148,11 @@ module.exports = {
                     // Không tìm thấy user_email tồn tại trong csdl, cho update email.
                 } 
                 else {
-                    Users.update({ user_id: client_user_id }, { user_email: update_email, user_fullname: user_fullname, user_sex: user_sex }).exec(function (err, updated) {
+                    Users.update(
+                        { user_id: client_user_id }, 
+                        { user_email: update_email, user_fullname: user_fullname, user_sex: user_sex }
+                    ).exec(function (err, updated) {
+
                         if (err) { return console.log(err) }
 
                         if (updated) {
@@ -158,7 +172,11 @@ module.exports = {
                 if (err) { return console.log(err) }
 
                 if (find) {
-                    Users.update({ user_id: user_id }, { user_fullname: user_fullname, user_sex: user_sex }).exec(function (err, updated) {
+                    Users.update(
+                        { user_id: user_id }, 
+                        { user_fullname: user_fullname, user_sex: user_sex }
+                    ).exec(function (err, updated) {
+
                         if (err) { return console.log(err) }
                         if (updated) {
                             return res.json({
@@ -179,18 +197,24 @@ module.exports = {
 
         }
     },
+
+    // Xóa user
     user_delete: function (req, res) {
         var user_id = req.param('user_id');
+
         if (!user_id || user_id === '' || user_id === 0) {
             return res.json({
                 status: 'error',
                 message: 'ID not found'
             });
         }
+
         Users.findOne({ user_id: user_id }).exec(function (err, find) {
+
             if (err) {
                 return console.log(err)
             }
+
             if (find) {
                 Users.destroy({ user_id: user_id }).exec(function (destroy) {
                     return res.json({
@@ -199,6 +223,7 @@ module.exports = {
                     });
                 });
             }
+
             else {
                 return res.json({
                     status: 'error',
@@ -214,7 +239,7 @@ module.exports = {
      * Đăng nhập thành công mã hóa user tạo token.
      */
     login: function (req, res) {
-        var user_email = req.param('user_email'),
+        var user_email    = req.param('user_email'),
             user_password = req.param('user_password');
 
         if (!user_email || user_email === '') {
@@ -232,11 +257,13 @@ module.exports = {
         }
 
         Users.findOne({ user_email: user_email }).exec(function (err, find) {
+
             if (err) { return console.log(err) }
 
             if (find) {
                 // Tìm thấy tiến hành so sánh password đã được mã hóa
                 Users.comparePassword(user_password, find, function (err, valid) {
+                    
                     if (err) { return console.log(err) }
 
                     if (valid) {
@@ -272,7 +299,7 @@ module.exports = {
      * Trước khi lưu mật khẩu mới vào csdl thì phải mã hóa mật khẩu.
      */
     change_password: function (req, res) {
-        var user_id = req.param('user_id'),
+        var user_id      = req.param('user_id'),
             old_password = req.param('old_password'),
             new_password = req.param('new_password');
 
@@ -303,7 +330,9 @@ module.exports = {
             if (find) {
                 // So sánh có mật khẩu có đúng với chuỗi đã mã hóa trong csdl không.
                 Users.comparePassword(old_password, find, function (err, vaild) {
+
                     if (err) { return console.log(err); }
+
                     if (vaild) {
                         // Đúng, mã hóa mật khẩu mới trước khi lưu vào csdl
                         bcrypt.genSalt(10, function (err, salt) {
@@ -313,7 +342,11 @@ module.exports = {
                                 }
 
                                 if (hash) {
-                                    Users.update({ user_id: user_id }, { user_password: hash }).exec(function (err, updated) {
+                                    Users.update(
+                                        { user_id: user_id }, 
+                                        { user_password: hash }
+                                    ).exec(function (err, updated) {
+
                                         if (err) { return cb(err);; }
 
                                         if (updated) {
