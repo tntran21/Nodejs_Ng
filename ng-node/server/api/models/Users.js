@@ -32,7 +32,8 @@ module.exports = {
       enum: ["male", "female"]
     }
   },
-  //truoc khi nhap mat khau vao csdl thi ma hoa password truoc
+
+  // Trước khi lưu mật khẩu vào csdl thì phải mã hóa.
   beforeCreate: function (user, cb) {
     bcrypt.genSalt(10, function (err, salt) {
       bcrypt.hash(user.user_password, salt, function (err, hash) {
@@ -47,7 +48,7 @@ module.exports = {
     });
   },
 
-  //Kiem tra mat khau, so sanh hai chuoi da ma hoa
+  // Kiểm tra mật khẩu với chuỗi mật khẩu được mã hóa trong csdl.
   comparePassword: function (password, user, cb) {
     bcrypt.compare(password, user.user_password, function (err, match) {
       if (err) {
@@ -60,6 +61,5 @@ module.exports = {
       }
     });
   }
-
 };
 
